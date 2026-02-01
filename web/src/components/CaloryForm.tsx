@@ -5,22 +5,23 @@ const CaloryForm = () => {
   const [label, setLabel] = useState("")
   const [qtyCalory, setQtyCalory] = useState(0)
   const [category, setCategory] = useState<"sport" | "repas">("repas")
-  const { calories } = useCalories()
+  const { calories, addCalory } = useCalories()
+
   const CATEGORIES_LIST = [
-  { label: "Repas / Encas", value: "repas" },
-  { label: "Activité Sportive", value: "sport" }
-];
-  const caloryEntry: CaloryEntry =  {
+    { label: "Repas / Encas", value: "repas" },
+    { label: "Activité Sportive", value: "sport" }
+  ];
+  const caloryEntry: CaloryEntry = {
     label,
     qtyCalory,
     category
   }
   return (
     <>
-      <form onSubmit={(e) => (
+      <form onSubmit={(e) => {
         e.preventDefault()
-        
-      )}>
+        addCalory(caloryEntry)
+      }}>
         <input
           type="text"
           name='label'
@@ -37,16 +38,16 @@ const CaloryForm = () => {
           className='input'
           value={qtyCalory}
           onChange={(e) => (
-            setQtyCalory(parseInt(e.target.value))
+            setQtyCalory(parseInt(e.target.value) || 0)
           )} />
 
-        <select name="category" id="category" value={category} className='select' onChange={(e) => { setCategory(e.target.value) }}>
+        <select name="category" id="category" value={category} className='select' onChange={(e) => { setCategory(e.target.value as "sport" | "repas") }}>
           {
             CATEGORIES_LIST.map((category, index) => (
               <option className='option'
                 value={category.value}
                 key={index}
-                
+
               >
                 {category.label}
               </option>
@@ -54,6 +55,8 @@ const CaloryForm = () => {
 
           }
         </select>
+        <br />
+        <button type='submit' className='button'>Soumettre</button>
       </form>
     </>
   )

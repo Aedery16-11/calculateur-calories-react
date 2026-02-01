@@ -10,7 +10,7 @@ import { useCalories } from '../contexts/CaloryContext'
 
 
 const TotalCalory = () => {
-    
+    const { calories } = useCalories()
     let absorbed = 0
     let lost = 0
     calories.map((entry) => {
