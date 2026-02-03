@@ -30,7 +30,7 @@ export const CaloriesProvider = ({ children }: PropsWithChildren) => {
             storeCalory(newCalory)
         },
         removeCalory: (index: number) => {
-            const newCalories = calories.filter((calory, i) => i !== index);
+            const newCalories = calories.filter((_calory, i) => i !== index);
             setCalories(newCalories);
             storeCalory(newCalories)
         }
