@@ -6,20 +6,17 @@ import ListCalory from './components/ListCalory'
 import CaloryForm from './components/CaloryForm'
 import { CaloriesProvider } from './contexts/CaloryContext'
 import './App.css'
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 
 function App() {
   return (
     <CaloriesProvider>
-      <h1>Compteur</h1>
-      <br />
-      <TotalCalory />
-      <hr />
-      <br />
-      <CaloryForm />
-      <hr />
-      <br />
-      <ListCalory />
-
+      <BrowserRouter>
+        <Routes>
+          <Route path='/' element={<><TotalCalory /> <ListCalory /></>} />
+          <Route path='/add' element={<CaloryForm />} />
+        </Routes>
+      </BrowserRouter>
     </CaloriesProvider>
   )
 }

@@ -1,14 +1,9 @@
 import React from 'react'
 import type { CaloryEntry } from '../models/CalorieEntry'
 import { useCalories } from '../contexts/CaloryContext'
-/* const entries: CaloryEntry[] = [
-    { label: "Pomme", category: "repas", qtyCalory: 50 },
-    { label: "Jogging", category: "sport", qtyCalory: -200 }
-]
- */
 
 const ListCalory = () => {
-    const { calories } = useCalories()
+    const { calories, removeCalory } = useCalories()
     return (
         <div className='overflow-x-auto rounded-box border border-base-content/5 bg-base-100'>
             <table className="table">
@@ -24,7 +19,7 @@ const ListCalory = () => {
                         <tr key={index}> 
                             <td>{entry.label}</td>{/* IL FAUT ABSOLUMENT UNE KEY A CHAQUE FOIS */}
                             <td>{entry.category}</td>
-                            <td>{entry.qtyCalory}</td>
+                            <td>{entry.qtyCalory} <button onClick={() => removeCalory(index)}>❌</button></td>
                         </tr>
                     ))}
                 </tbody>
