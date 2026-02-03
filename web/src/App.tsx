@@ -12,6 +12,9 @@ function App() {
   return (
     <CaloriesProvider>
       <BrowserRouter>
+        <nav>
+          <Link to="/">Accueil</Link> | <Link to="/add">Ajouter</Link>
+        </nav>
         <Routes>
           <Route path='/' element={<><TotalCalory /> <ListCalory /></>} />
           <Route path='/add' element={<CaloryForm />} />
