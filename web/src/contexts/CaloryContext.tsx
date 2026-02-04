@@ -18,16 +18,37 @@ export const CaloriesProvider = ({ children }: PropsWithChildren) => {
     const [calories, setCalories] = useState<CaloryEntry[]>([])
 
     useEffect(() => {
-        const storedCalories = readCalories();
-        setCalories(storedCalories);
+        const storedCalories = async () => {
+            const reponse = await fetch("http://localhost:3000/calories");
+            const object = await reponse.json();
+            setCalories(object);
+        }
+        storedCalories()
     }, [])
 
     return <CaloriesContext.Provider value={{
         calories,
         addCalory: (calory: CaloryEntry) => {
-            const newCalory = [...calories, calory]
-            setCalories(newCalory)
-            storeCalory(newCalory)
+            // 1. On envoie la demande au serveur (fetch)
+            fetch("http://localhost:3000/calories", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(calory)
+            })
+                .then((response) => {
+                    // 2. On attend la réponse du serveur
+                    return response.json();
+                })
+                .then((savedCalory) => {
+                    // 3. Le serveur a répondu ! On met à jour l'affichage avec la donnée confirmée
+                    // (savedCalory contient maintenant l'_id créé par MongoDB)
+                    setCalories((currentCalories) => [...currentCalories, savedCalory]);
+                })
+                .catch((error) => {
+                    console.error("Erreur lors de l'ajout :", error);
+                })
         },
         removeCalory: (index: number) => {
             const newCalories = calories.filter((_calory, i) => i !== index);
@@ -47,10 +68,3 @@ const storeCalory = (calories: CaloryEntry[]) => {
     localStorage.setItem('calories', JSON.stringify(calories));
 }
 
-const readCalories = (): CaloryEntry[] => {
-    const value = localStorage.getItem('calories');
-    if (value) {
-        return JSON.parse(value) as CaloryEntry[];
-    }
-    return [];
-}
