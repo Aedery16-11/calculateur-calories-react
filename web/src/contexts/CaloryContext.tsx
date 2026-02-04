@@ -49,11 +49,20 @@ export const CaloriesProvider = ({ children }: PropsWithChildren) => {
                 .catch((error) => {
                     console.error("Erreur lors de l'ajout :", error);
                 })
-        },
+        }, 
         removeCalory: (index: number) => {
-            const newCalories = calories.filter((_calory, i) => i !== index);
+            const idToDelete = calories[index]._id
+            console.log("ID à supprimer :", idToDelete);
+            if (idToDelete) {
+                    fetch(`http://localhost:3000/calories/${idToDelete}`, {
+                        method: "DELETE",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                    })
+                }
+            const newCalories = calories.filter((calory, i) => i !== index);
             setCalories(newCalories);
-            storeCalory(newCalories)
         }
     }}>
         {children}
@@ -63,8 +72,3 @@ export const CaloriesProvider = ({ children }: PropsWithChildren) => {
 export const useCalories = () => {
     return useContext(CaloriesContext);
 }
-
-const storeCalory = (calories: CaloryEntry[]) => {
-    localStorage.setItem('calories', JSON.stringify(calories));
-}
-
