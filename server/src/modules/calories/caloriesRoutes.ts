@@ -1,6 +1,35 @@
 import { Router } from "express";
+import { db } from "../../db";
+import { CaloryEntry } from "./caloriesModels";
+
 export const caloryRoutes = Router();
 
-caloryRoutes.get("/", async (request, response) => {
-  response.json({message: "Liste des calories"})
+// GET /calories : Lister (avec filtre optionnel sur category)
+caloryRoutes.get("/", async (req, res) => {
+  // On récupère le paramètre d'URL (ex: ?category=sport)
+  // C'est standard en Express pour les filtres
+  const categoryFilter = req.query.category as string;
+  
+  // Si on a un filtre, on cherche { category: "sport" }, sinon on cherche tout {}
+  const query = categoryFilter ? { category: categoryFilter } : {};
+
+  // Syntaxe MongoDB native (identique à ApplyUp)
+  const calories = await db.collection<CaloryEntry>("entries").find(query).toArray();
+  
+  res.status(200).json(calories);
+});
+
+// POST /calories : Ajouter
+caloryRoutes.post("/", async (req, res) => {
+  const newEntry = req.body as CaloryEntry;
+
+  // Validation avec TES champs
+  if (!newEntry.label || !newEntry.qtyCalory || !newEntry.category) {
+    return res.status(400).json({ error: "Champs manquants" });
+  }
+
+  // Insertion MongoDB native
+  const result = await db.collection<CaloryEntry>("entries").insertOne(newEntry);
+  
+  res.status(201).json({ ...newEntry, _id: result.insertedId });
 });
