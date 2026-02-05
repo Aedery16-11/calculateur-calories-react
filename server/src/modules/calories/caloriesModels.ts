@@ -8,13 +8,13 @@ export interface CaloryEntry {
   qtyCalory: number;    // Ex: 500
   category: "sport" | "repas", // Soit un apport, soit une dépense
   dateAjout: Date,
-  userdId: string, // ID de l'utilisateur qui a créé l'entrée
+  userId: string, // ID de l'utilisateur qui a créé l'entrée
 }
 
-export const caloryEntrySchema = Joi.object<CaloryEntry>({
+// Le schéma Joi ne valide que ce que le client envoie
+export const caloryEntrySchema = Joi.object({
   label: Joi.string().required(),
   qtyCalory: Joi.number().required(),
   category: Joi.string().valid("sport", "repas").required(),
-  dateAjout: Joi.date().required(),
-  userdId: Joi.string().required(),
+  //on ne vérifie pas la date car elle est générée par mongo db
 });

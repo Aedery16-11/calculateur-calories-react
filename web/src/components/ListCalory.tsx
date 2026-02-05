@@ -10,6 +10,7 @@ const ListCalory = () => {
                         <th>Label</th>
                         <th>Categorie</th>
                         <th>Calories</th>
+                        <th>Date</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -17,7 +18,8 @@ const ListCalory = () => {
                         <tr key={entry._id}>
                             <td>{entry.label}</td>{/* IL FAUT ABSOLUMENT UNE KEY A CHAQUE FOIS */}
                             <td>{entry.category}</td>
-                            <td>{entry.qtyCalory} <button onClick={() => removeCalory(entry._id)}>❌</button></td>
+                            <td>{entry.qtyCalory} <button onClick={() => entry._id && removeCalory(entry._id)}>❌</button></td>
+                            <td>{new Date(entry.dateAjout || "").toLocaleDateString()}</td>
                         </tr>
                     ))}
                 </tbody>

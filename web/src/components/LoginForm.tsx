@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export const LoginForm = () => {
+  const navigate = useNavigate();
   const { login } = useAuth();
 
   const [email, setEmail] = useState("");
@@ -22,6 +24,7 @@ export const LoginForm = () => {
         onSubmit={(e) => {
           e.preventDefault();
           login(email, password);
+          navigate("/")
         }}
       >
         <input

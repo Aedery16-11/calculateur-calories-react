@@ -6,7 +6,7 @@ import { useAuth } from "./AuthContext"
 type CaloryContextType = {
     calories: CaloryEntry[]
     addCalory: (calory: CaloryEntry) => void
-    removeCalory: (index: number) => void
+    removeCalory: (id: string) => void // <--- Changement ici : string (ID) et plus index
 }
 
 export const CaloriesContext = createContext<CaloryContextType>({
@@ -37,7 +37,6 @@ export const CaloriesProvider = ({ children }: PropsWithChildren) => {
         calories,
         addCalory: (calory: CaloryEntry) => {
             if (!token) return;
-            // 1. On envoie la demande au serveur (fetch)
             fetch("http://localhost:3000/calories", {
                 method: "POST",
                 headers: {
@@ -46,34 +45,26 @@ export const CaloriesProvider = ({ children }: PropsWithChildren) => {
                 },
                 body: JSON.stringify(calory)
             })
-                .then((response) => {
-                    // 2. On attend la réponse du serveur
-                    return response.json();
-                })
+                .then((response) => response.json())
                 .then((savedCalory) => {
-                    // 3. Le serveur a répondu ! On met à jour l'affichage avec la donnée confirmée
-                    // (savedCalory contient maintenant l'_id créé par MongoDB)
                     setCalories((currentCalories) => [...currentCalories, savedCalory]);
                 })
-                .catch((error) => {
-                    console.error("Erreur lors de l'ajout :", error);
-                })
-        }, 
-        removeCalory: (index: number) => {
+                .catch((error) => console.error("Erreur ajout:", error))
+        },
+        removeCalory: (id: string) => { // <--- On prend l'ID directement
             if (!token) return;
-            const idToDelete = calories[index]._id
-            console.log("ID à supprimer :", idToDelete);
-            if (idToDelete) {
-                    fetch(`http://localhost:3000/calories/${idToDelete}`, {
-                        method: "DELETE",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": `Bearer ${token}`
-                        },
-                    })
-                }
-            const newCalories = calories.filter((_calory, i) => i !== index);
-            setCalories(newCalories);
+
+            // 1. On supprime visuellement tout de suite (plus réactif)
+            setCalories((current) => current.filter((entry) => entry._id !== id));
+
+            // 2. On envoie la requête au serveur
+            fetch(`http://localhost:3000/calories/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+            }).catch(e => console.error("Erreur suppression", e));
         }
     }}>
         {children}
