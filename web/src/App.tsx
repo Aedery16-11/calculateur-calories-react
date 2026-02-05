@@ -9,7 +9,8 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { Header } from './components/Header';
 import { LoginForm } from './components/LoginForm';
 import { AuthForm } from './components/AuthForm'; // <--- Import ajouté
-
+import { AdminRoute } from './components/AdminRoutes';
+import { AdminTemplates } from './components/AdminTemplates';
 function App() {
   return (
     <AuthProvider>
@@ -27,6 +28,11 @@ function App() {
                 <TotalCalory />
                 <ListCalory />
               </ProtectedRoute>
+            } />
+            <Route path='/admin' element={
+              <AdminRoute>
+                <AdminTemplates />
+              </AdminRoute>
             } />
             <Route path='/add' element={
               <ProtectedRoute>
