@@ -7,7 +7,8 @@ export interface CaloryEntry {
   label: string;       // Ex: "Pizza"
   qtyCalory: number;    // Ex: 500
   category: "sport" | "repas", // Soit un apport, soit une dépense
-  dateAjout?: Date
+  dateAjout: Date,
+  userdId: string, // ID de l'utilisateur qui a créé l'entrée
 }
 
 export const caloryEntrySchema = Joi.object<CaloryEntry>({
@@ -15,4 +16,5 @@ export const caloryEntrySchema = Joi.object<CaloryEntry>({
   qtyCalory: Joi.number().required(),
   category: Joi.string().valid("sport", "repas").required(),
   dateAjout: Joi.date().required(),
+  userdId: Joi.string().required(),
 });
