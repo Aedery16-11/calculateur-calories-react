@@ -27,21 +27,30 @@ caloryRoutes.get("/", async (req, res) => {
 });
 
 // POST /calories : Ajouter
-caloryRoutes.post("/", validator.body(caloryEntrySchema), async (req, res) => {
+caloryRoutes.post("/", async (req, res) => {
   const newEntry = req.body as CaloryEntry;
 
-  // Insertion MongoDB native
-  const result = await db.collection<CaloryEntry>("entries").insertOne(newEntry);
+  //si il manque le label ou la quantité ou la catégorie, on renvoie une erreur
+  if (!newEntry.label || !newEntry.qtyCalory || !newEntry.category) {
+    return res.status(400).json({ error: "Champs manquants" });
+  }
+
+  //on copie les données de newEntry et on ajoute la date d'ajout en plus
+  const entryToSave = {
+    ...newEntry,
+    dateAjout: new Date()
+  };
+
+  //et du conp c'est entryToSave qu'on va 
+  const result = await db.collection<CaloryEntry>("entries").insertOne(entryToSave);
   
-  res.status(201).json({ ...newEntry, _id: result.insertedId });
+  res.status(201).json({ ...entryToSave, _id: result.insertedId }); // On renvoie l'entrée avec son ID généré par MongoDB
 });
-// Complète cette ligne :
-// Dans caloriesRoutes.ts
+
 
 
 caloryRoutes.delete("/:id", async (req, res) => {
   const id = req.params.id;
-  console.log("1. SERVEUR : Reçu ID :", id);
 
   try {
       const mongoId = new ObjectId(id);
