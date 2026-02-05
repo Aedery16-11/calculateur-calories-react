@@ -16,13 +16,33 @@ caloryRoutes.get("/", async (req, res) => {
   // On récupère le paramètre d'URL (ex: ?category=sport)
   // C'est standard en Express pour les filtres
   const categoryFilter = req.query.category as "sport" | "repas";
-  
+
   // Si on a un filtre, on cherche { category: "sport" }, sinon on cherche tout {}
   const query = categoryFilter ? { category: categoryFilter } : {};
 
   // Syntaxe MongoDB native (identique à ApplyUp)
-  const calories = await db.collection<CaloryEntry>("entries").find(query).toArray();
-  
+  const calories = await db
+    .collection<CaloryEntry>("entries")
+    .find(query)
+    .toArray();
+
+  res.status(200).json(calories);
+});
+//trier par date et pas par catégorie
+caloryRoutes.get("/", async (req, res) => {
+  const { userId } = (req as any).auth as JwtPayload;
+  console.log(`User ${userId} is fetching calories`);
+
+  const dateAjout = req.query.dateAjout;
+
+  const query = dateAjout ? { dateAjout: dateAjout } : {};
+  //ici le -1 sert à dire que l'on veut trier par ordre décroissant (du plus récent au plus ancien)
+  const calories = await db
+    .collection<CaloryEntry>("entries")
+    .find(query)
+    .sort({ dateAjout: -1 })
+    .toArray();
+
   res.status(200).json(calories);
 });
 
@@ -38,32 +58,32 @@ caloryRoutes.post("/", async (req, res) => {
   //on copie les données de newEntry et on ajoute la date d'ajout en plus
   const entryToSave = {
     ...newEntry,
-    dateAjout: new Date()
+    dateAjout: new Date(),
   };
 
-  //et du conp c'est entryToSave qu'on va 
-  const result = await db.collection<CaloryEntry>("entries").insertOne(entryToSave);
-  
+  //et du conp c'est entryToSave qu'on va
+  const result = await db
+    .collection<CaloryEntry>("entries")
+    .insertOne(entryToSave);
+
   res.status(201).json({ ...entryToSave, _id: result.insertedId }); // On renvoie l'entrée avec son ID généré par MongoDB
 });
-
-
 
 caloryRoutes.delete("/:id", async (req, res) => {
   const id = req.params.id;
 
   try {
-      const mongoId = new ObjectId(id);
-      console.log("2. SERVEUR : ID Transformé en ObjectId");
+    const mongoId = new ObjectId(id);
+    console.log("2. SERVEUR : ID Transformé en ObjectId");
 
-      // Vérifie bien le nom de la collection ici ("entries" ? "calories" ?)
-      const result = await db.collection("entries").deleteOne({ _id: mongoId });
-      
-      console.log("3. SERVEUR : Résultat MongoDB :", result);
+    // Vérifie bien le nom de la collection ici ("entries" ? "calories" ?)
+    const result = await db.collection("entries").deleteOne({ _id: mongoId });
 
-      res.status(200).json(result);
+    console.log("3. SERVEUR : Résultat MongoDB :", result);
+
+    res.status(200).json(result);
   } catch (e) {
-      console.error("ERREUR SERVEUR :", e);
-      res.status(500).json({error: "Erreur interne"});
+    console.error("ERREUR SERVEUR :", e);
+    res.status(500).json({ error: "Erreur interne" });
   }
 });
