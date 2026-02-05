@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ username: email, password }),
+      body: JSON.stringify({ email, password }),
     })
     const json = await response.json()
     setToken(json.token)

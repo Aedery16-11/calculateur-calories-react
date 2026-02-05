@@ -10,20 +10,16 @@ caloryRoutes.use(authMiddleware);
 
 // GET /calories : Lister (avec filtre optionnel sur category)
 caloryRoutes.get("/", async (req, res) => {
-  const { userId } = (req as any).auth as JwtPayload;
+  const { userId } = (req as any).auth; //on recupère l'ID de l'utilisateur à partir du token d'authentification
   console.log(`User ${userId} is fetching calories`);
-
-  // On récupère le paramètre d'URL (ex: ?category=sport)
-  // C'est standard en Express pour les filtres
-  const categoryFilter = req.query.category as "sport" | "repas";
-
-  // Si on a un filtre, on cherche { category: "sport" }, sinon on cherche tout {}
-  const query = categoryFilter ? { category: categoryFilter } : {};
-
-  // Syntaxe MongoDB native (identique à ApplyUp)
+  const dateAjout = req.query.dateAjout; //pour faire le filtre de date on récupère la date
+  const query = dateAjout //si la date est fournie on ajoute la date au query sinon on ne met que l'ID de l'utilisateur pour récupérer toutes ses entrées
+    ? { userId: userId, dateAjout: dateAjout } //c'est le cas où elle est fournie
+    : { userId: userId }; //c'est le cas où elle n'est pas fournie on veut juste récupérer toutes les entrées de l'utilisateur x
   const calories = await db
     .collection<CaloryEntry>("entries")
     .find(query)
+    .sort({ dateAjout: -1 }) // On garde ton tri (le plus récent en haut)
     .toArray();
 
   res.status(200).json(calories);
