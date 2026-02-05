@@ -24,28 +24,12 @@ caloryRoutes.get("/", async (req, res) => {
 
   res.status(200).json(calories);
 });
-//trier par date et pas par catégorie
-caloryRoutes.get("/", async (req, res) => {
-  const { userId } = (req as any).auth as JwtPayload;
-  console.log(`User ${userId} is fetching calories`);
 
-  const dateAjout = req.query.dateAjout;
-
-  const query = dateAjout ? { dateAjout: dateAjout } : {};
-  //ici le -1 sert à dire que l'on veut trier par ordre décroissant (du plus récent au plus ancien)
-  const calories = await db
-    .collection<CaloryEntry>("entries")
-    .find(query)
-    .sort({ dateAjout: -1 })
-    .toArray();
-
-  res.status(200).json(calories);
-});
 
 // POST /calories : Ajouter
 caloryRoutes.post("/", async (req, res) => {
   const newEntry = req.body as CaloryEntry;
-
+  const { userId } = (req as any).auth;
   //si il manque le label ou la quantité ou la catégorie, on renvoie une erreur
   if (!newEntry.label || !newEntry.qtyCalory || !newEntry.category) {
     return res.status(400).json({ error: "Champs manquants" });
@@ -55,6 +39,7 @@ caloryRoutes.post("/", async (req, res) => {
   const entryToSave = {
     ...newEntry,
     dateAjout: new Date(),
+    userId: userId,
   };
 
   //et du conp c'est entryToSave qu'on va

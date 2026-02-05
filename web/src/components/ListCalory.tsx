@@ -13,11 +13,11 @@ const ListCalory = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {calories.map((entry, index) => ( /* pour avoir la key, on peut utiliser l'objet "id" de la classe si elle en possède, ici non donc on le crée avc .map() */
-                        <tr key={index}>
+                    {calories.map((entry) => ( /* pour avoir la key, on peut utiliser l'objet "id" de la classe si elle en possède, ici non donc on le crée avc .map() */
+                        <tr key={entry._id}>
                             <td>{entry.label}</td>{/* IL FAUT ABSOLUMENT UNE KEY A CHAQUE FOIS */}
                             <td>{entry.category}</td>
-                            <td>{entry.qtyCalory} <button onClick={() => removeCalory(index)}>❌</button></td>
+                            <td>{entry.qtyCalory} <button onClick={() => removeCalory(entry._id)}>❌</button></td>
                         </tr>
                     ))}
                 </tbody>
