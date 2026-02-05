@@ -6,11 +6,13 @@ export type AuthContextType = {
   token?: string;
   login: (email: string, password: string) => void;
   logout: () => void;
+  signup: (email: string, password: string) => void;
 };
 
 export const AuthContext = createContext<AuthContextType>({
   login: () => false,
   logout: () => { },
+  signup: () => { },
 });
 
 export const AuthProvider = ({ children }: PropsWithChildren) => {
@@ -45,9 +47,32 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     localStorage.removeItem("token");
     setToken(undefined);
   };
+  const signup = async (email: string, password: string) => {
+    try {
+      const response = await fetch('http://localhost:3000/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
+      if (!response.ok) {
+        throw new Error("Erreur de connexion");
+      }
+
+      const json = await response.json();
+
+      localStorage.setItem("token", json.token);
+      setToken(json.token);
+
+    } catch (error) {
+      console.error(error);
+      alert("Erreur d'identifiants");
+    }
+  }
   return (
-    <AuthContext.Provider value={{ token, login, logout }}>
+    <AuthContext.Provider value={{ token, login, logout, signup }}>
       {children}
     </AuthContext.Provider>
   );
