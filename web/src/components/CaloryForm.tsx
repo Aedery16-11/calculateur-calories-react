@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { useCalories } from '../contexts/CaloryContext'
 import type { CaloryEntry } from '../models/CalorieEntry'
+import { useNavigate } from 'react-router-dom'
 const CaloryForm = () => {
   const [label, setLabel] = useState("")
   const [qtyCalory, setQtyCalory] = useState(0)
   const [category, setCategory] = useState<"sport" | "repas">("repas")
   const { addCalory } = useCalories()
-
+  const navigate = useNavigate();
   const CATEGORIES_LIST = [
     { label: "Repas / Encas", value: "repas" },
     { label: "Activité Sportive", value: "sport" }
@@ -21,6 +22,7 @@ const CaloryForm = () => {
       <form onSubmit={(e) => {
         e.preventDefault()
         addCalory(caloryEntry)
+        navigate("/")
       }}>
         <input
           type="text"
