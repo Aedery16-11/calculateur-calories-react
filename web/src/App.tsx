@@ -1,26 +1,37 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import TotalCalory from './components/TotalCalory'  // ✅ Bon chemin
 import ListCalory from './components/ListCalory'
 import CaloryForm from './components/CaloryForm'
 import { CaloriesProvider } from './contexts/CaloryContext'
 import './App.css'
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { Header } from './components/Header';
+import { LoginForm } from './components/LoginForm';
 
 function App() {
   return (
-    <CaloriesProvider>
-      <BrowserRouter>
-        <nav>
-          <Link to="/">Accueil</Link> | <Link to="/add">Ajouter</Link>
-        </nav>
-        <Routes>
-          <Route path='/' element={<><TotalCalory /> <ListCalory /></>} />
-          <Route path='/add' element={<CaloryForm />} />
-        </Routes>
-      </BrowserRouter>
-    </CaloriesProvider>
+    <AuthProvider>
+      <CaloriesProvider>
+        <BrowserRouter>
+          <Header />
+          <Routes>
+            <Route path='/login' element={<LoginForm />} />
+            <Route path='/' element={
+              <ProtectedRoute>
+                <TotalCalory /> 
+                <ListCalory />
+              </ProtectedRoute>
+            } />
+            <Route path='/add' element={
+              <ProtectedRoute>
+                <CaloryForm />
+              </ProtectedRoute>
+            } />
+          </Routes>
+        </BrowserRouter>
+      </CaloriesProvider>
+    </AuthProvider>
   )
 }
 

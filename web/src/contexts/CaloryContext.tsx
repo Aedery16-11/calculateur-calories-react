@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react"
 import type { PropsWithChildren } from "react"
 import type { CaloryEntry } from "../models/CalorieEntry"
+import { useAuth } from "./AuthContext"
 
 type CaloryContextType = {
     calories: CaloryEntry[]
@@ -16,24 +17,32 @@ export const CaloriesContext = createContext<CaloryContextType>({
 
 export const CaloriesProvider = ({ children }: PropsWithChildren) => {
     const [calories, setCalories] = useState<CaloryEntry[]>([])
+    const { token } = useAuth();
 
     useEffect(() => {
         const storedCalories = async () => {
-            const reponse = await fetch("http://localhost:3000/calories");
+            if (!token) return;
+            const reponse = await fetch("http://localhost:3000/calories", {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
             const object = await reponse.json();
             setCalories(object);
         }
         storedCalories()
-    }, [])
+    }, [token])
 
     return <CaloriesContext.Provider value={{
         calories,
         addCalory: (calory: CaloryEntry) => {
+            if (!token) return;
             // 1. On envoie la demande au serveur (fetch)
             fetch("http://localhost:3000/calories", {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
                 },
                 body: JSON.stringify(calory)
             })
@@ -51,17 +60,19 @@ export const CaloriesProvider = ({ children }: PropsWithChildren) => {
                 })
         }, 
         removeCalory: (index: number) => {
+            if (!token) return;
             const idToDelete = calories[index]._id
             console.log("ID à supprimer :", idToDelete);
             if (idToDelete) {
                     fetch(`http://localhost:3000/calories/${idToDelete}`, {
                         method: "DELETE",
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
                         },
                     })
                 }
-            const newCalories = calories.filter((calory, i) => i !== index);
+            const newCalories = calories.filter((_calory, i) => i !== index);
             setCalories(newCalories);
         }
     }}>

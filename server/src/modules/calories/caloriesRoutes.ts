@@ -1,11 +1,18 @@
 import { Router } from "express";
 import { db } from "../../db";
-import { CaloryEntry } from "./caloriesModels";
+import { CaloryEntry, caloryEntrySchema } from "./caloriesModels";
 import { ObjectId } from "mongodb";
+import { authMiddleware, JwtPayload } from "../auth/jwt";
+import { validator } from "../../validator";
 export const caloryRoutes = Router();
+
+caloryRoutes.use(authMiddleware);
 
 // GET /calories : Lister (avec filtre optionnel sur category)
 caloryRoutes.get("/", async (req, res) => {
+  const { userId } = (req as any).auth as JwtPayload;
+  console.log(`User ${userId} is fetching calories`);
+
   // On récupère le paramètre d'URL (ex: ?category=sport)
   // C'est standard en Express pour les filtres
   const categoryFilter = req.query.category as "sport" | "repas";
@@ -20,13 +27,8 @@ caloryRoutes.get("/", async (req, res) => {
 });
 
 // POST /calories : Ajouter
-caloryRoutes.post("/", async (req, res) => {
+caloryRoutes.post("/", validator.body(caloryEntrySchema), async (req, res) => {
   const newEntry = req.body as CaloryEntry;
-
-  // Validation avec TES champs
-  if (!newEntry.label || !newEntry.qtyCalory || !newEntry.category) {
-    return res.status(400).json({ error: "Champs manquants" });
-  }
 
   // Insertion MongoDB native
   const result = await db.collection<CaloryEntry>("entries").insertOne(newEntry);

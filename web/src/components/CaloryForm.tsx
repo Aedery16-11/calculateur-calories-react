@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useCalories } from '../contexts/CaloryContext'
 import type { CaloryEntry } from '../models/CalorieEntry'
 const CaloryForm = () => {
   const [label, setLabel] = useState("")
   const [qtyCalory, setQtyCalory] = useState(0)
   const [category, setCategory] = useState<"sport" | "repas">("repas")
-  const { calories, addCalory } = useCalories()
+  const { addCalory } = useCalories()
 
   const CATEGORIES_LIST = [
     { label: "Repas / Encas", value: "repas" },

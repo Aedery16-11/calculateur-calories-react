@@ -1,5 +1,3 @@
-import React from 'react'
-import type { CaloryEntry } from '../models/CalorieEntry'
 import { useCalories } from '../contexts/CaloryContext'
 
 const ListCalory = () => {
