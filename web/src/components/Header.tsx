@@ -7,7 +7,15 @@ export const Header = () => {
   return (
     <nav>
       <Link to="/">Accueil</Link> | <Link to="/add">Ajouter</Link> |{" "}
-      {token ? (
+      
+      {!token && ( //si pas de token, on affiche s'inscrire
+        <>
+          <Link to="/signup">S'inscrire</Link> |{" "}
+        </>
+      )}
+
+     
+      {token ? ( //si token, on affiche logout
         <>
           <span>User connecté</span> |{" "}
           <button onClick={logout} className="text-blue-500 underline">
