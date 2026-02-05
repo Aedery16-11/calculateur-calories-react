@@ -22,9 +22,10 @@ export const Header = () => {
           <button onClick={logout} className="button">
             Logout
           </button>
+          <br />
           {role === "admin" && (
             <>
-              <Link to="/admin">Admin</Link> |{" "}
+              <Link to="/admin">Créer une template</Link> |{" "}
             </>
           )}
         </>

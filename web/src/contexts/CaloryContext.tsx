@@ -6,35 +6,51 @@ import { useAuth } from "./AuthContext"
 type CaloryContextType = {
     calories: CaloryEntry[]
     addCalory: (calory: CaloryEntry) => void
-    removeCalory: (id: string) => void // <--- Changement ici : string (ID) et plus index
+    removeCalory: (id: string) => void
+    filterDate: string;
+    setFilterDate: (date: string) => void;
 }
 
 export const CaloriesContext = createContext<CaloryContextType>({
     calories: [],
     addCalory: () => { },
     removeCalory: () => { },
+    filterDate: "",
+    setFilterDate: () => { }
 });
 
 export const CaloriesProvider = ({ children }: PropsWithChildren) => {
     const [calories, setCalories] = useState<CaloryEntry[]>([])
+    const [filterDate, setFilterDate] = useState<string>("")
     const { token } = useAuth();
 
     useEffect(() => {
         const storedCalories = async () => {
             if (!token) return;
-            const reponse = await fetch("http://localhost:3000/calories", {
+            const url = filterDate 
+                ? `http://localhost:3000/calories?dateAjout=${filterDate}`
+                : "http://localhost:3000/calories";
+            
+            const reponse = await fetch(url, {
                 headers: {
                     "Authorization": `Bearer ${token}`
                 }
             });
             const object = await reponse.json();
-            setCalories(object);
+            // Sécurité : s'assurer que c'est un tableau
+            if (Array.isArray(object)) {
+                setCalories(object);
+            } else {
+                setCalories([]);
+            }
         }
         storedCalories()
-    }, [token])
+    }, [token, filterDate])
 
     return <CaloriesContext.Provider value={{
         calories,
+        filterDate,
+        setFilterDate,
         addCalory: (calory: CaloryEntry) => {
             if (!token) return;
             fetch("http://localhost:3000/calories", {
@@ -51,13 +67,9 @@ export const CaloriesProvider = ({ children }: PropsWithChildren) => {
                 })
                 .catch((error) => console.error("Erreur ajout:", error))
         },
-        removeCalory: (id: string) => { // <--- On prend l'ID directement
+        removeCalory: (id: string) => {
             if (!token) return;
-
-            // 1. On supprime visuellement tout de suite (plus réactif)
             setCalories((current) => current.filter((entry) => entry._id !== id));
-
-            // 2. On envoie la requête au serveur
             fetch(`http://localhost:3000/calories/${id}`, {
                 method: "DELETE",
                 headers: {

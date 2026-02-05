@@ -23,7 +23,7 @@ export const AdminTemplates = () => {
 
   return (
     <form onSubmit={handleSubmit} className="admin-form">
-      <h3> Ajouter un Template</h3>
+      <h3> Ajouter un Template</h3> <br />
       <input placeholder="Nom (ex: Pizza)" value={label} onChange={e => setLabel(e.target.value)} className="input" />
       <br />
       <input type="number" placeholder="Calories" value={qty} onChange={e => setQty(Number(e.target.value))} className="input" />

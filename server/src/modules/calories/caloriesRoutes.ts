@@ -12,10 +12,17 @@ caloryRoutes.use(authMiddleware);
 caloryRoutes.get("/", async (req, res) => {
   const { userId } = (req as any).auth; //on recupère l'ID de l'utilisateur à partir du token d'authentification
   console.log(`User ${userId} is fetching calories`);
-  const dateAjout = req.query.dateAjout; //pour faire le filtre de date on récupère la date
-  const query = dateAjout //si la date est fournie on ajoute la date au query sinon on ne met que l'ID de l'utilisateur pour récupérer toutes ses entrées
-    ? { userId: userId, dateAjout: dateAjout } //c'est le cas où elle est fournie
-    : { userId: userId }; //c'est le cas où elle n'est pas fournie on veut juste récupérer toutes les entrées de l'utilisateur x
+  const dateAjout = req.query.dateAjout as string; 
+  let query: any = { userId: userId };
+
+  if (dateAjout) {
+    const start = new Date(dateAjout);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(dateAjout);
+    end.setHours(23, 59, 59, 999);
+    query.dateAjout = { $gte: start, $lte: end };
+  }
+
   const calories = await db
     .collection<CaloryEntry>("entries")
     .find(query)
